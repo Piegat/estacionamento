@@ -3,6 +3,7 @@ package br.com.uniamerica.estacionamento.controller;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -62,14 +63,54 @@ public class ModeloController {
     @PostMapping
 
     public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
-        this.modeloRepository.save(modelo);
+        try {
+            this.modeloRepository.save(modelo);
+            return ResponseEntity.ok("Registro cadastrado com sucesso");
 
-        return ResponseEntity.ok("Registro Cadastrado com Sucesso");
+        }
 
+        catch(Exception e) {
+
+            return ResponseEntity.badRequest().body("Error: " + e.getStackTrace());
+
+        }
 
     }
-    /*
+
+
+
     @PutMapping
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+
+        final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
+
+
+        try {
+
+            if (modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())) {
+                throw new RuntimeException("Não foi possivel identificar o registro informado");
+
+            }
+                this.modeloRepository.save(modelo);
+                return ResponseEntity.ok("Registro atualizado com sucesso");
+
+            }
+         catch (DataIntegrityViolationException e) {
+
+            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
+
+        }
+    }
+
+
+
+
+
+    /*
     @DeleteMapping*/
 
 }
