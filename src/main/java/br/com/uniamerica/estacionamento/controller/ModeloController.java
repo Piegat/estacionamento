@@ -27,12 +27,7 @@ public class ModeloController {
     @return
     */
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Modelo> findbyIdPatch (@PathVariable("id") final Long id){
 
-      return ResponseEntity.ok(new Modelo());
-
-    }
 
 
 
@@ -47,16 +42,33 @@ public class ModeloController {
      */
 
     @GetMapping
-    public ResponseEntity<Modelo> findbyId (@RequestParam("id") final Long id){
+    public ResponseEntity<?> findbyId (@RequestParam("id") final Long id){
 
-        return ResponseEntity.ok(new Modelo());
+        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
+
+
+        return modelo == null ? ResponseEntity.badRequest().body("Nenhum valor encontrado. ") : ResponseEntity.ok(modelo);
 
     }
 
 
-    /*@GetMapping
+    @GetMapping("/lista")
+    public ResponseEntity<?> listaCompleta(){
+
+      return ResponseEntity.ok(this.modeloRepository.findAll());
+
+    }
 
     @PostMapping
+
+    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
+        this.modeloRepository.save(modelo);
+
+        return ResponseEntity.ok("Registro Cadastrado com Sucesso");
+
+
+    }
+    /*
     @PutMapping
     @DeleteMapping*/
 
