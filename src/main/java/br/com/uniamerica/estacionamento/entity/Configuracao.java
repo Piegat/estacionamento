@@ -7,13 +7,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "configuracoes", schema = "public")
-
+@Audited
+@AuditTable( value = "configuracao_audit", schema = "audit")
 public class Configuracao extends AbstractEntity{
 
     @Getter @Setter
