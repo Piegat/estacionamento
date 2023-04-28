@@ -14,13 +14,11 @@ public class CondutorController {
 
         @Autowired
         private CondutorRepository condutorRepository;
-    /*
-    http://localhost:8080/api/modelo?id=1
 
-    @param id
-    @return
-     */
-        @GetMapping("/{id}")
+
+    //-------------------------------- ID ----------------------------------------
+
+        @GetMapping
         public ResponseEntity<?> findbyId (@RequestParam("id") final Long id){
 
         final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
@@ -28,19 +26,28 @@ public class CondutorController {
 
     }
 
-        @GetMapping
-        public ResponseEntity<?> findbyAtivo (@RequestParam("ativo") final Long id){
+    //-------------------------------- ALL  ----------------------------------------
 
-        final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
-        return condutor == null ? ResponseEntity.badRequest().body("Nenhum valor encontrado. ") : ResponseEntity.ok(condutor);
-
-    }
-        @GetMapping("/lista")
+    @GetMapping("/lista")
         public ResponseEntity<?> listaCompleta(){
 
         return ResponseEntity.ok(this.condutorRepository.findAll());
     }
-        @PostMapping
+
+
+    //-------------------------------- ATIVO ----------------------------------------
+
+    @GetMapping("/ativo")
+    public ResponseEntity<?> findbyAtivo(){
+        return ResponseEntity.ok(this.condutorRepository.findByAtivo());
+
+    }
+
+
+    //-------------------------------- POST  ----------------------------------------
+
+
+    @PostMapping
         public ResponseEntity<?> cadastrar(@RequestBody final Condutor condutor){
         try {
             this.condutorRepository.save(condutor);
@@ -53,7 +60,10 @@ public class CondutorController {
         }
 
     }
-        @PutMapping
+
+    //-------------------------------- PUT ----------------------------------------
+
+    @PutMapping
         public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Condutor condutor) {
 
         final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
@@ -84,16 +94,19 @@ public class CondutorController {
 
     }
 
+    //-------------------------------- DELETE ----------------------------------------
 
-        @DeleteMapping
+
+    @DeleteMapping
         public ResponseEntity<?> delete(@RequestParam("id") final Long id) {
 
 
         try {
             final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
             assert condutorBanco != null;
-            this.condutorRepository.delete(condutorBanco);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
+                this.condutorRepository.delete(condutorBanco);
+                return ResponseEntity.ok("Registro atualizado com sucesso");
+
 
         }
         catch (RuntimeException e) {

@@ -16,12 +16,9 @@ public class ModeloController {
 
     @Autowired
     private ModeloRepository modeloRepository;
-    /*
-    http://localhost:8080/api/modelo?id=1
 
-    @param id
-    @return
-     */
+
+    //-------------------------------- ID ----------------------------------------
     @GetMapping
     public ResponseEntity<?> findbyId (@RequestParam("id") final Long id){
 
@@ -29,15 +26,28 @@ public class ModeloController {
         return modelo == null ? ResponseEntity.badRequest().body("Nenhum valor encontrado. ") : ResponseEntity.ok(modelo);
 
     }
+
+    // -------------------------------- ALL ----------------------------------------
     @GetMapping("/lista")
     public ResponseEntity<?> listaCompleta(){
 
       return ResponseEntity.ok(this.modeloRepository.findAll());
     }
+
+    //-------------------------------- ATIVO ----------------------------------------
+
+    @GetMapping("/ativo")
+    public ResponseEntity<?> findbyAtivo (){
+
+        return ResponseEntity.ok(this.modeloRepository.findByAtivo());
+
+    }
+    //-------------------------------- POST ----------------------------------------
     @PostMapping
-    @RequestMapping(value = "/api/modelo")
     public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
+
         try {
+
             this.modeloRepository.save(modelo);
             return ResponseEntity.ok("Registro cadastrado com sucesso");
 
@@ -48,6 +58,8 @@ public class ModeloController {
         }
 
     }
+
+    //-------------------------------- PUT ----------------------------------------
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
 
