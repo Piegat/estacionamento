@@ -1,6 +1,8 @@
 package br.com.uniamerica.estacionamento.repositoriy;
 
 import br.com.uniamerica.estacionamento.entity.Modelo;
+import br.com.uniamerica.estacionamento.entity.Movimentacao;
+import org.springframework.beans.PropertyValues;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +19,9 @@ public interface ModeloRepository extends JpaRepository<Modelo, Long> {
 
     @Query(value = "select * from Modelo where ativo = true", nativeQuery = true)
     public List<Modelo> findByAtivo();
+
+    @Query("from Modelo where marca.id = :id")
+    public List<Modelo> findByMarcaId(@Param("id") final Long id);
+
 
 }

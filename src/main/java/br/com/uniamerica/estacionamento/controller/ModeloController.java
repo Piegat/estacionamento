@@ -2,6 +2,8 @@ package br.com.uniamerica.estacionamento.controller;
 
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
+import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
+import br.com.uniamerica.estacionamento.repositoriy.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ public class ModeloController {
 
     @Autowired
     private ModeloRepository modeloRepository;
+    private VeiculoRepository veiculoRepository;
 
 
     //-------------------------------- ID ----------------------------------------
@@ -93,22 +96,23 @@ public class ModeloController {
 
 
     @DeleteMapping
-    public ResponseEntity<?> delete(@RequestParam("id") final Long id) {
-
-
-        try {
+    public ResponseEntity<?> deletar(
+            @RequestParam("id") final Long id
+    ){
+        try{
             final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-            assert modeloBanco != null;
-            this.modeloRepository.delete(modeloBanco);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
-
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-        }
-
-
-
-    }
-
+            if(modeloBanco == null){
+                throw new RuntimeException("Condutor nao encontrado");
+            }
+            if(!this.veiculoRepository.findByModeloId(id).isEmpty()){
+                modeloBanco.setAtivo(false);
+                this.modeloRepository.save(modeloBanco);
+                return ResponseEntity.ok("Registro desativado com sucesso!");
+            }else{
+                this.modeloRepository.delete(modeloBanco);
+                return ResponseEntity.ok("Registro apagado com sucesso!");
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }}
 }

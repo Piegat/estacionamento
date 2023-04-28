@@ -18,6 +18,7 @@ public class MovimentacaoController {
     @Autowired
     private MovimentacaoRepository movimentacaoRepository;
 
+
     //-------------------------------- ID ----------------------------------------
     @GetMapping
     public ResponseEntity<?> findbyId (@RequestParam("id") final Long id){

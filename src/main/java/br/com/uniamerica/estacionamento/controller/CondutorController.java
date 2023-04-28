@@ -2,6 +2,7 @@ package br.com.uniamerica.estacionamento.controller;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.repositoriy.CondutorRepository;
+import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ public class CondutorController {
 
         @Autowired
         private CondutorRepository condutorRepository;
+      private MovimentacaoRepository movimentacaoRepository;
+
 
 
     //-------------------------------- ID ----------------------------------------
@@ -40,6 +43,7 @@ public class CondutorController {
     @GetMapping("/ativo")
     public ResponseEntity<?> findbyAtivo(){
         return ResponseEntity.ok(this.condutorRepository.findByAtivo());
+
 
     }
 
@@ -98,24 +102,25 @@ public class CondutorController {
 
 
     @DeleteMapping
-        public ResponseEntity<?> delete(@RequestParam("id") final Long id) {
-
-
-        try {
+    public ResponseEntity<?> deletar(
+            @RequestParam("id") final Long id
+    ){
+        try{
             final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
-            assert condutorBanco != null;
+            if(condutorBanco == null){
+                throw new RuntimeException("Condutor nao encontrado");
+            }
+            if(!this.movimentacaoRepository.findByCondutorId(id).isEmpty()){
+                condutorBanco.setAtivo(false);
+                this.condutorRepository.save(condutorBanco);
+                return ResponseEntity.ok("Registro desativado com sucesso!");
+            }else{
                 this.condutorRepository.delete(condutorBanco);
-                return ResponseEntity.ok("Registro atualizado com sucesso");
-
-
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-        }
-
-
-
-    }
+                return ResponseEntity.ok("Registro apagado com sucesso!");
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+}}
 
 
     }

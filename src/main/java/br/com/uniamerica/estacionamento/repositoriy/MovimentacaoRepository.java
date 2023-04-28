@@ -13,4 +13,14 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
 
     @Query(value = "select * from Movimentacoes where ativo = true", nativeQuery = true)
     public List<Movimentacao> findByNomeLikeNative(@Param("veiculo") final Movimentacao veiculo);
+
+    @Query("from Movimentacao where condutor.id = :id")
+    public List<Movimentacao> findByCondutorId(@Param("id") final Long id);
+
+    @Query("from Movimentacao where veiculo.id = :id")
+    public List<Movimentacao> findByVeiculoId(@Param("id") final Long id);
+
+
+
+
 }

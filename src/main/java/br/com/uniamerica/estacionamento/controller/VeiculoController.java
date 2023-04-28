@@ -3,6 +3,7 @@ package br.com.uniamerica.estacionamento.controller;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
+import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import br.com.uniamerica.estacionamento.repositoriy.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,12 +22,7 @@ public class VeiculoController {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
-    /*
-    http://localhost:8080/api/modelo?id=1
-
-    @param id
-    @return
-     */
+    private MovimentacaoRepository movimentacaoRepository;
 
 
 
@@ -110,22 +106,23 @@ public class VeiculoController {
 
 
     @DeleteMapping
-    public ResponseEntity<?> delete(@RequestParam("id") final Long id) {
-
-
-        try {
+    public ResponseEntity<?> deletar(
+            @RequestParam("id") final Long id
+    ){
+        try{
             final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
-            assert veiculoBanco != null;
-            this.veiculoRepository.delete(veiculoBanco);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
-
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-        }
-
-
-
-    }
-
+            if(veiculoBanco == null){
+                throw new RuntimeException("Condutor nao encontrado");
+            }
+            if(!this.movimentacaoRepository.findByVeiculoId(id).isEmpty()){
+                veiculoBanco.setAtivo(false);
+                this.veiculoRepository.save(veiculoBanco);
+                return ResponseEntity.ok("Registro desativado com sucesso!");
+            }else{
+                this.veiculoRepository.delete(veiculoBanco);
+                return ResponseEntity.ok("Registro apagado com sucesso!");
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }}
 }
