@@ -1,6 +1,7 @@
 package br.com.uniamerica.estacionamento.repositoriy;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
+import br.com.uniamerica.estacionamento.entity.Configuracao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,5 +15,10 @@ public interface CondutorRepository extends JpaRepository<Condutor, Long> {
 
     @Query(value = "select * from condutores where ativo = true", nativeQuery = true)
     public List<Condutor> findByAtivo();
+
+    @Query("from Condutor where cpf = :cpf")
+    public List<Condutor> findByCpf(@Param("cpf") final String cpf);
+
+
 
 }

@@ -5,6 +5,7 @@ import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.repositoriy.MarcaRepository;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
+import br.com.uniamerica.estacionamento.service.MarcaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,10 @@ public class MarcaController {
 
     @Autowired
     private MarcaRepository marcaRepository;
+    @Autowired
     private ModeloRepository modeloRepository;
+    @Autowired
+    private MarcaService marcaService;
 
     //-------------------------------- ID ----------------------------------------
 
@@ -56,14 +60,11 @@ public class MarcaController {
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Marca marca){
-        try {
-            this.marcaRepository.save(marca);
-            return ResponseEntity.ok("Registro cadastrado com sucesso");
-
-        }
-
-        catch(Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getStackTrace());
+        try{
+            final Marca newMarca = this.marcaService.cadastrar(marca);
+            return ResponseEntity.ok("Marca cadastrada com sucesso!");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
     }
@@ -74,33 +75,16 @@ public class MarcaController {
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Marca marca) {
 
-        final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
 
         try {
-
-            if (marcaBanco == null || !marcaBanco.getId().equals(marca.getId())) {
-                throw new RuntimeException("Não foi possivel identificar o registro informado");
-
-            }
-            this.marcaRepository.save(marca);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
+            final Marca marcaAtualizada = this.marcaService.editar(id, marca);
+            return ResponseEntity.ok( "Marca  atualizada com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch (DataIntegrityViolationException e) {
-
-            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
-
-        }
-
-        catch (RuntimeException e) {
-
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-
-        }
-
-
-
     }
+
+
 
     //-------------------------------- DELETE----------------------------------------
 
@@ -109,20 +93,10 @@ public class MarcaController {
             @RequestParam("id") final Long id
     ){
         try{
-            final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
-            if(marcaBanco == null){
-                throw new RuntimeException("Condutor nao encontrado");
-            }
-            if(!this.modeloRepository.findByMarcaId(id).isEmpty()){
-                marcaBanco.setAtivo(false);
-                this.marcaRepository.save(marcaBanco);
-                return ResponseEntity.ok("Registro desativado com sucesso!");
-            }else{
-                this.marcaRepository.delete(marcaBanco);
-                return ResponseEntity.ok("Registro apagado com sucesso!");
-            }
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-}}
+        return this.marcaService.deletar(id);
+    }catch (Exception e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
 
 }

@@ -3,19 +3,29 @@ package br.com.uniamerica.estacionamento.controller;
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.repositoriy.CondutorRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
+import br.com.uniamerica.estacionamento.service.CondutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.HashMap;
+
+@RestController
 @RequestMapping(value = "/api/condutor")
 public class CondutorController {
 
         @Autowired
         private CondutorRepository condutorRepository;
-      private MovimentacaoRepository movimentacaoRepository;
+        @Autowired
+        private MovimentacaoRepository movimentacaoRepository;
+        @Autowired
+        private CondutorService condutorService;
 
 
 
@@ -52,50 +62,25 @@ public class CondutorController {
 
 
     @PostMapping
-        public ResponseEntity<?> cadastrar(@RequestBody final Condutor condutor){
+        public ResponseEntity<?> cadastrar(@RequestBody @Validated final Condutor condutor){
         try {
-            this.condutorRepository.save(condutor);
-            return ResponseEntity.ok("Registro cadastrado com sucesso");
-
+            final Condutor newCondutor = this.condutorService.cadastrar(condutor);
+            return ResponseEntity.ok("Condutor cadastrado com sucesso");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch(Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getStackTrace());
-        }
-
     }
 
     //-------------------------------- PUT ----------------------------------------
 
     @PutMapping
-        public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Condutor condutor) {
-
-        final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
-
+        public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody @Validated final Condutor condutor) {
         try {
-
-            if (condutorBanco == null || !condutorBanco.getId().equals(condutor.getId())) {
-                throw new RuntimeException("Não foi possivel identificar o registro informado");
-
-            }
-            this.condutorRepository.save(condutor);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
+            final Condutor condutorBanco = this.condutorService.editar(id, condutor);
+            return ResponseEntity.ok("Condutor  editado com sucesso");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch (DataIntegrityViolationException e) {
-
-            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
-
-        }
-
-        catch (RuntimeException e) {
-
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-
-        }
-
-
-
     }
 
     //-------------------------------- DELETE ----------------------------------------
@@ -106,21 +91,14 @@ public class CondutorController {
             @RequestParam("id") final Long id
     ){
         try{
-            final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
-            if(condutorBanco == null){
-                throw new RuntimeException("Condutor nao encontrado");
-            }
-            if(!this.movimentacaoRepository.findByCondutorId(id).isEmpty()){
-                condutorBanco.setAtivo(false);
-                this.condutorRepository.save(condutorBanco);
-                return ResponseEntity.ok("Registro desativado com sucesso!");
-            }else{
-                this.condutorRepository.delete(condutorBanco);
-                return ResponseEntity.ok("Registro apagado com sucesso!");
-            }
+            return this.condutorService.deletar(id);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
-}}
-
-
+        }
     }
+
+
+
+
+
+}

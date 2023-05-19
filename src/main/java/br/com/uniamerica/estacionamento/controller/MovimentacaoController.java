@@ -4,6 +4,7 @@ import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.repositoriy.CondutorRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
+import br.com.uniamerica.estacionamento.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ public class MovimentacaoController {
 
     @Autowired
     private MovimentacaoRepository movimentacaoRepository;
+    @Autowired
+    private MovimentacaoService movimentacaoService;
 
 
     //-------------------------------- ID ----------------------------------------
@@ -32,9 +35,9 @@ public class MovimentacaoController {
 //    -------------------------------- ABERTA ----------------------------------------
 
     @GetMapping("/ativo")
-    public ResponseEntity<?> findbyAtivo (@RequestParam(value = "ativo", required = false, defaultValue = "true") final Long id){
+    public ResponseEntity<?> findbyAtivo (@RequestParam(value = "ativo", required = false, defaultValue = "true") final boolean ativo){
 
-        final Movimentacao movimentacao = this.movimentacaoRepository.findById(id).orElse(null);
+        final Movimentacao movimentacao = this.movimentacaoRepository.findByAtivo(ativo);
         return movimentacao == null ? ResponseEntity.badRequest().body("Nenhum valor encontrado. ") : ResponseEntity.ok(movimentacao);
 
     }
@@ -53,69 +56,38 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Movimentacao movimentacao){
         try {
-            this.movimentacaoRepository.save(movimentacao);
-            return ResponseEntity.ok("Registro cadastrado com sucesso");
-
+            final Movimentacao movimentacaoBanco = this.movimentacaoService.cadastrar(movimentacao);
+            return ResponseEntity.ok("Movimentação cadastrada com sucesso");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch(Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getStackTrace());
-        }
-
     }
 
     // -------------------------------- PUT ----------------------------------------
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Movimentacao movimentacao) {
-
-        final Movimentacao movimentacaoBanco = this.movimentacaoRepository.findById(id).orElse(null);
-
-        try {
-
-            if (movimentacaoBanco == null || !movimentacaoBanco.getId().equals(movimentacao.getId())) {
-                throw new RuntimeException("Não foi possivel identificar o registro informado");
-
+        {
+            try {
+                final Movimentacao movimentacaoBanco = this.movimentacaoService.editar(id, movimentacao);
+                return ResponseEntity.ok("Movimentação editado com sucesso");
+            } catch (Exception e){
+                return ResponseEntity.badRequest().body(e.getMessage());
             }
-            this.movimentacaoRepository.save(movimentacao);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
         }
-
-        catch (DataIntegrityViolationException e) {
-
-            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
-
-        }
-
-        catch (RuntimeException e) {
-
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-
-        }
-
-
-
     }
 
 
     @DeleteMapping
-    public ResponseEntity<?> delete(@RequestParam("id") final Long id) {
-
-
-        try {
-            final Movimentacao movimentacaoBanco = this.movimentacaoRepository.findById(id).orElse(null);
-            assert movimentacaoBanco != null;
-            this.movimentacaoRepository.delete(movimentacaoBanco);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
-
-
+    public ResponseEntity<?> deletar(
+            @RequestParam("id") final Long id
+    ){
+        try{
+            return this.movimentacaoService.desativar(id);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-        }
-
-
-
     }
-
-
 }
+
+
+

@@ -5,6 +5,7 @@ import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import br.com.uniamerica.estacionamento.repositoriy.VeiculoRepository;
+import br.com.uniamerica.estacionamento.service.VeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,10 @@ public class VeiculoController {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
+    @Autowired
     private MovimentacaoRepository movimentacaoRepository;
+    @Autowired
+    private VeiculoService veiculoService;
 
 
 
@@ -58,15 +62,11 @@ public class VeiculoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Veiculo veiculo){
         try {
-            this.veiculoRepository.save(veiculo);
-            return ResponseEntity.ok("Registro cadastrado com sucesso");
-
+            final Veiculo newVeiculo = this.veiculoService.cadastrar(veiculo);
+            return ResponseEntity.ok(String.format("Veiulo placa [ %s ] cadastrado com sucesso!", newVeiculo.getPlaca()));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch(Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-
     }
 
 
@@ -75,54 +75,23 @@ public class VeiculoController {
 
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Veiculo veiculo) {
-
-        final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
-
         try {
-
-            if (veiculoBanco == null || !veiculoBanco.getId().equals(veiculo.getId())) {
-                throw new RuntimeException("Não foi possivel identificar o registro informado");
-
-            }
-            this.veiculoRepository.save(veiculo);
-            return ResponseEntity.ok("Registro atualizado com sucesso");
+            final Veiculo newVeiculo = this.veiculoService.editar(id, veiculo);
+            return ResponseEntity.ok(String.format("Veiulo placa [ %s ] editado com sucesso!", newVeiculo.getPlaca()));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch (DataIntegrityViolationException e) {
-
-            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
-
-        }
-
-        catch (RuntimeException e) {
-
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-
-        }
-
-
-
     }
 
 
     @DeleteMapping
     public ResponseEntity<?> deletar(
             @RequestParam("id") final Long id
-    ){
+    ){{
         try{
-            final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
-            if(veiculoBanco == null){
-                throw new RuntimeException("Condutor nao encontrado");
-            }
-            if(!this.movimentacaoRepository.findByVeiculoId(id).isEmpty()){
-                veiculoBanco.setAtivo(false);
-                this.veiculoRepository.save(veiculoBanco);
-                return ResponseEntity.ok("Registro desativado com sucesso!");
-            }else{
-                this.veiculoRepository.delete(veiculoBanco);
-                return ResponseEntity.ok("Registro apagado com sucesso!");
-            }
+            return this.veiculoService.desativar(id);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
-        }}
-}
+        }
+    }
+}}

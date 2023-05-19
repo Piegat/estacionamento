@@ -18,10 +18,12 @@ import java.time.LocalTime;
 @AuditTable( value = "movimentacoes_audit", schema = "audit")
 public class Movimentacao extends AbstractEntity{
 
+    @NotNull(message = "Veiculo não pode ser nulo para realizar uma movimentação")
     @Getter @Setter
-    @JoinColumn(name = "veiculo", nullable = false, unique = true)
+    @JoinColumn(name = "veiculo", nullable = false)
     @ManyToOne
     private Veiculo veiculo;
+    @NotNull(message = "Condutor não pode ser nulo para realizar uma movimentação")
     @Getter @Setter
     @JoinColumn(name = "condutor", nullable = false)
     @ManyToOne
@@ -33,15 +35,22 @@ public class Movimentacao extends AbstractEntity{
     @Column(name = "data_saida")
     private LocalDateTime saida;
     @Getter @Setter
-    @Column(name = "tempo_total")
-    private LocalTime tempo;
+    @Column(name = "horas_tempo_total")
+    private int horastempo;
+
+    @Getter @Setter
+    @Column(name = "minutos_tempo_total")
+    private int minutostempo;
 
     @Getter @Setter
     @Column(name = "tempo_desconto")
     private LocalTime tempoDesconto;
     @Getter @Setter
-    @Column(name = "tempo_multa")
-    private LocalTime tempoMulta;
+    @Column(name = "horas_multa")
+    private int horasMulta;
+    @Getter @Setter
+    @Column(name = "Minutos_multa")
+    private int minutosMulta;
     @Getter @Setter
     @Column(name = "valor_desconto")
     private BigDecimal valorDesconto;

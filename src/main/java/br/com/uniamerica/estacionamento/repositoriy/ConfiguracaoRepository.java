@@ -11,4 +11,8 @@ import java.util.List;
 @Repository
 public interface ConfiguracaoRepository extends JpaRepository<Configuracao, Long> {
     @Query(value = "select * from configuracoes where valorHora like :valorHora", nativeQuery = true)
-    public List<Configuracao> findByNomeLikeNative(@Param("valorHora") final Configuracao valorHora);}
+    public List<Configuracao> findByNomeLikeNative(@Param("valorHora") final Configuracao valorHora);
+
+    @Query("from Configuracao where id = 1 order by id desc limit 1")
+    public Configuracao findByConfiguracao();
+}

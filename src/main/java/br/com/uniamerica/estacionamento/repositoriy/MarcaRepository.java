@@ -12,7 +12,7 @@ import java.util.List;
 public interface MarcaRepository  extends JpaRepository<Marca, Long> {
 
     @Query("from Marca where marca Like :marca")
-    public List<Marca> findByLike(@Param("marca")final String marca);
+    public List<Marca> findByNome(@Param("marca")final String marca);
 
     @Query(value = "select * from marca where ativo = true", nativeQuery = true)
     public List<Marca> findByAtivo();

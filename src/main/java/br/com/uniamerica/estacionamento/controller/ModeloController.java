@@ -4,6 +4,7 @@ import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.repositoriy.ModeloRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import br.com.uniamerica.estacionamento.repositoriy.VeiculoRepository;
+import br.com.uniamerica.estacionamento.service.ModeloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,10 @@ public class ModeloController {
 
     @Autowired
     private ModeloRepository modeloRepository;
+    @Autowired
     private VeiculoRepository veiculoRepository;
+    @Autowired
+    private ModeloService modeloService;
 
 
     //-------------------------------- ID ----------------------------------------
@@ -50,14 +54,10 @@ public class ModeloController {
     public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
 
         try {
-
-            this.modeloRepository.save(modelo);
-            return ResponseEntity.ok("Registro cadastrado com sucesso");
-
-        }
-
-        catch(Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            final Modelo newModelo = this.modeloService.cadastrar(modelo);
+            return ResponseEntity.ok("Modelo cadastrado com sucesso");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
     }
@@ -66,33 +66,15 @@ public class ModeloController {
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
 
-        final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-
         try {
-
-            if (modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())) {
-                throw new RuntimeException("Não foi possivel identificar o registro informado");
-
-            }
-                this.modeloRepository.save(modelo);
-                return ResponseEntity.ok("Registro atualizado com sucesso");
+            final Modelo modeloBanco = this.modeloService.editar(id, modelo);
+            return ResponseEntity.ok(String.format("Modelo [ %s ] editado com sucesso", modeloBanco.getNome()));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        catch (DataIntegrityViolationException e) {
-
-            return ResponseEntity.internalServerError().body("Error: " + e.getCause().getMessage());
-
-        }
-
-        catch (RuntimeException e) {
-
-            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
-
-        }
-
-
-
     }
+
+
 
 
     @DeleteMapping
@@ -100,19 +82,9 @@ public class ModeloController {
             @RequestParam("id") final Long id
     ){
         try{
-            final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-            if(modeloBanco == null){
-                throw new RuntimeException("Condutor nao encontrado");
-            }
-            if(!this.veiculoRepository.findByModeloId(id).isEmpty()){
-                modeloBanco.setAtivo(false);
-                this.modeloRepository.save(modeloBanco);
-                return ResponseEntity.ok("Registro desativado com sucesso!");
-            }else{
-                this.modeloRepository.delete(modeloBanco);
-                return ResponseEntity.ok("Registro apagado com sucesso!");
-            }
+            return this.modeloService.deletar(id);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
-        }}
+        }
+    }
 }
