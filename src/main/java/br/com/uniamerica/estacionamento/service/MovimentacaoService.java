@@ -42,6 +42,7 @@ public class MovimentacaoService {
 
         final Configuracao configuracao = this.configuracaoRepository.findByConfiguracao();
 
+        //          Verifica os campos que são notNull
         Assert.notNull(movimentacao.getCondutor(), "Condutor não informado! Informe o ID do condutor!");
         Assert.notNull(movimentacao.getVeiculo(), "Veiculo não informado! Informe o ID do veiculo!");
         Assert.notNull(movimentacao.getEntrada(), "Data de Entrada não informada!");
@@ -92,6 +93,9 @@ public class MovimentacaoService {
 
 
 //          Verifica os campos que são notNull
+        Assert.notNull(movimentacao.getCadastro(), "Não informado a data de cadastro");
+        Assert.notNull(movimentacao.getId(), "Não informado o ID");
+        Assert.notNull(movimentacao.getAtivo(), "Não informado ATIVO = True / Else");
         Assert.notNull(movimentacao.getCondutor(), "Condutor não informado!!");
         Assert.notNull(movimentacao.getVeiculo(), "Veiculo não informado!");
         Assert.notNull(movimentacao.getEntrada(), "Data de Entrada não informada!");

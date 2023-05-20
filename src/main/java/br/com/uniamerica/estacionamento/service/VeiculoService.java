@@ -39,6 +39,8 @@ public class VeiculoService {
         Assert.notNull(modelo, "Modelo informado não existe!");
 
         return this.veiculoRepository.save(veiculo);
+
+
     }
     @Transactional
     public Veiculo editar(Long id, Veiculo veiculo){
@@ -47,8 +49,12 @@ public class VeiculoService {
         final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
         Assert.notNull(veiculoBanco, "Veiculo não existe!");
 
+        // Verifica campos notnull
+        Assert.notNull(veiculo.getCadastro(), "Não informado a data de cadastro");
+        Assert.notNull(veiculo.getId(), "Não informado o ID");
+        Assert.notNull(veiculo.getAtivo(), "Não informado ATIVO = True / Else");
 
-         // Verifica os veiculos coincidem
+        // Verifica os veiculos coincidem
         Assert.isTrue(veiculoBanco.getId().equals(veiculo.getId()), "Veiculo informado não é o mesmo que o veiculo a ser atualizado");
 
 
