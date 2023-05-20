@@ -49,7 +49,7 @@ public class Movimentacao extends AbstractEntity{
     @Column(name = "horas_multa")
     private int horasMulta;
     @Getter @Setter
-    @Column(name = "Minutos_multa")
+    @Column(name = "minutos_multa")
     private int minutosMulta;
     @Getter @Setter
     @Column(name = "valor_desconto")

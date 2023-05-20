@@ -32,11 +32,17 @@ public class Configuracao extends AbstractEntity{
     @Column(name = "fim_expediente")
     private LocalTime fimExpediente;
     @Getter @Setter
-    @Column(name = "tempo_para_desconto")
-    private LocalTime tempoParaDesconto;
+    @Column(name = "horas_para_desconto")
+    private int horasParaDesconto;
     @Getter @Setter
-    @Column(name = "tempo_de_desconto")
-    private LocalTime tempoDeDesconto;
+    @Column(name = "minutos_para_desconto")
+    private int minutosParaDesconto;
+    @Getter @Setter
+    @Column(name = "horas_de_desconto")
+    private int horasDeDesconto;
+    @Getter @Setter
+    @Column(name = "minutos_de_desconto")
+    private int minutosDeDesconto;
     @Getter @Setter
     @Column(name = "gerar_desconto")
     private Boolean gerarDesconto;

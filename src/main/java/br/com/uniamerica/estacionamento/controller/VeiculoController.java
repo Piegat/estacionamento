@@ -10,10 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/veiculo")
 public class VeiculoController {
 
@@ -60,7 +61,7 @@ public class VeiculoController {
 
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Veiculo veiculo){
+    public ResponseEntity<?> cadastrar(@RequestBody @Validated final Veiculo veiculo){
         try {
             final Veiculo newVeiculo = this.veiculoService.cadastrar(veiculo);
             return ResponseEntity.ok(String.format("Veiulo placa [ %s ] cadastrado com sucesso!", newVeiculo.getPlaca()));
@@ -74,7 +75,7 @@ public class VeiculoController {
     //-------------------------------- PUT ----------------------------------------
 
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Veiculo veiculo) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody @Validated final Veiculo veiculo) {
         try {
             final Veiculo newVeiculo = this.veiculoService.editar(id, veiculo);
             return ResponseEntity.ok(String.format("Veiulo placa [ %s ] editado com sucesso!", newVeiculo.getPlaca()));

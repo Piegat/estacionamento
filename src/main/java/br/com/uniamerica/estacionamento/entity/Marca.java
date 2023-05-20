@@ -18,10 +18,10 @@ import org.hibernate.envers.Audited;
 public class Marca extends AbstractEntity{
 
 
-    @Size(min = 1, max = 50, message = "Tamanho indevido para nomear uma marca! Respeite o minimo de 1 caractere e o maximo de 50")
     @NotNull
     @Getter @Setter
-    @Column(name = "marca", nullable = false, unique = true, length = 50)
+    @Size(min = 1, max = 25, message = "Tamanho indevido para nomear uma marca! Respeite o minimo de 1 caractere e o maximo de 50")
+    @Column(name = "marca", nullable = false, unique = true, length = 25)
     private String marca;
 
 }

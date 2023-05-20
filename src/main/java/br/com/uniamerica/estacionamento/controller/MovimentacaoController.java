@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/movimentacoes")
 public class MovimentacaoController {
 
@@ -54,7 +55,7 @@ public class MovimentacaoController {
 
     // -------------------------------- POST ----------------------------------------
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Movimentacao movimentacao){
+    public ResponseEntity<?> cadastrar(@RequestBody @Validated final Movimentacao movimentacao){
         try {
             final Movimentacao movimentacaoBanco = this.movimentacaoService.cadastrar(movimentacao);
             return ResponseEntity.ok("Movimentação cadastrada com sucesso");

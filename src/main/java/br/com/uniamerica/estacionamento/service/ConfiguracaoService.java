@@ -25,7 +25,13 @@ public class ConfiguracaoService {
 
     @Transactional
     public Configuracao editar(Long id, Configuracao configuracao){
-         // Verifica se a configuracao existe
+
+        Assert.notNull(configuracao.getCadastro(), "Não informado a data de cadastro");
+        Assert.notNull(configuracao.getId(), "Não informado o ID");
+        Assert.notNull(configuracao.getAtivo(), "Não informado ATIVO = True / Else");
+
+
+        // Verifica se a configuracao existe
 
         final Configuracao configuracaoBanco = this.configuracaoRepository.findById(id).orElse(null);
         Assert.notNull(configuracaoBanco, "Configuração não existe!");

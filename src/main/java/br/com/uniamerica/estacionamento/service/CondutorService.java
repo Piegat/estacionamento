@@ -24,10 +24,7 @@ public class CondutorService {
 
         Assert.notNull(condutor.getNome(), "Nome do condutor não informado!");
         Assert.notNull(condutor.getCpf(), "CPF do condutor não informado!");
-        Assert.hasText(condutor.getCpf(), "Campo de CPF vazio");
         Assert.hasText(condutor.getNome(), "Campo do nome vazio");
-        final String formatoCpf = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}";
-        Assert.isTrue(condutor.getCpf().matches(formatoCpf), "CPF No formato incorreto!");
 
         final List<Condutor> condutorByCpf = this.condutorRepository.findByCpf(condutor.getCpf());
         Assert.isTrue(condutorByCpf.isEmpty(), String.format("Condutor com CPF [ %s ] já existe!", condutor.getCpf()));
@@ -40,6 +37,10 @@ public class CondutorService {
 
     @Transactional
     public Condutor editar(Long id, Condutor condutor) {
+
+        Assert.notNull(condutor.getCadastro(), "Não informado a data de cadastro");
+        Assert.notNull(condutor.getId(), "Não informado o ID");
+        Assert.notNull(condutor.getAtivo(), "Não informado ATIVO = True / Else");
 
         //Verifica se o condutor existe
         final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
@@ -57,7 +58,7 @@ public class CondutorService {
         final List<Condutor> condutorByCpf = this.condutorRepository.findByCpf(condutor.getCpf());
         Assert.isTrue(condutorByCpf.isEmpty(), "Condutor com CPF já existente!");
 
-        return this.condutorRepository.save(condutorBanco);
+        return this.condutorRepository.save(condutor);
 
     }
 

@@ -32,20 +32,22 @@ public class Condutor extends AbstractEntity{
     @Column(name = "cpf_condutor", nullable = false, unique = true, length = 15)
     private String cpf;
     @Getter @Setter
+    @NotNull(message = "não pode ser nulo")
+    @Size(min = 1, max = 20, message = "Telefone no formato invalido ou faltando/sobrando caracteres, verifique por gentileza")
     @Column(name = "telefone_condutor", nullable = false, length = 20)
     private String telefone;
 
-    @NotNull
+    @NotNull(message = "não pode ser nulo")
     @Getter @Setter
     @Column(name = "tempo_desconto", nullable = false)
     private LocalTime tempoDesconto;
 
-    @NotNull
+    @NotNull(message = "não pode ser nulo")
     @Getter @Setter
     @Column(name = "tempo_horas", nullable = false)
     private int horas;
 
-    @NotNull
+    @NotNull(message = "não pode ser nulo")
     @Getter @Setter
     @Column(name = "tempo_minutos", nullable = false)
     private int minutos;

@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/modelo")
 public class ModeloController {
 
@@ -51,7 +52,7 @@ public class ModeloController {
     }
     //-------------------------------- POST ----------------------------------------
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
+    public ResponseEntity<?> cadastrar(@RequestBody @Validated final Modelo modelo){
 
         try {
             final Modelo newModelo = this.modeloService.cadastrar(modelo);
@@ -64,7 +65,7 @@ public class ModeloController {
 
     //-------------------------------- PUT ----------------------------------------
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody @Validated final Modelo modelo) {
 
         try {
             final Modelo modeloBanco = this.modeloService.editar(id, modelo);

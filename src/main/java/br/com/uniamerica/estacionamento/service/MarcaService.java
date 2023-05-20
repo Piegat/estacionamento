@@ -46,6 +46,7 @@ public class MarcaService {
 
         Assert.notNull(marca.getMarca(), "Marca não informada");
 
+
         return this.marcaRepository.save(marca);
     }
 
@@ -61,10 +62,10 @@ public class MarcaService {
         if (!this.modeloRepository.findByMarcaId(id).isEmpty()) {
             marcaBanco.setAtivo(false);
             this.marcaRepository.save(marcaBanco);
-            return ResponseEntity.ok("Condutor DESATIVADO pois está relacionado a movimentações!");
+            return ResponseEntity.ok("Marca DESATIVADO pois está relacionado a movimentações!");
         } else {
             this.marcaRepository.delete(marcaBanco);
-            return ResponseEntity.ok("Condutor DELETADO pois NÂO está relacionado a movimentações!");
+            return ResponseEntity.ok("Marca DELETADO pois NÂO está relacionado a movimentações!");
         }
 
     }

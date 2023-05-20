@@ -16,24 +16,20 @@ import org.hibernate.envers.Audited;
 public class Veiculo extends AbstractEntity{
 
 
-    @NotNull(message = "Modelo não pode ser nulo!")
     @Getter @Setter
     @JoinColumn(name = "modelo", nullable = false)
     @ManyToOne
     private Modelo modelo;
 
-    @NotNull(message = "Placa não informada")
     @Size(min = 1, max = 10, message = "Placa não informada no tamanho permitido, minimo: 1 | maximo: 10")
     @Getter @Setter
     @Column(name = "placa", nullable = false, unique = true, length = 10)
     private String placa;
-    @NotNull(message = "Cor não informado corretamente")
     @Getter @Setter
     @Column(name = "cor", nullable = false)
     @Enumerated(EnumType.STRING)
     private Cor cor;
 
-    @NotNull(message = "Tipo do veiculo não informada")
     @Getter @Setter
     @Column(name = "tipo_veiculo", nullable = false)
     @Enumerated(EnumType.STRING)

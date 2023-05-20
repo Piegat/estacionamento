@@ -10,9 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/marca")
 public class MarcaController {
 
@@ -59,7 +60,7 @@ public class MarcaController {
     //-------------------------------- POST ----------------------------------------
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Marca marca){
+    public ResponseEntity<?> cadastrar(@RequestBody @Validated final Marca marca){
         try{
             final Marca newMarca = this.marcaService.cadastrar(marca);
             return ResponseEntity.ok("Marca cadastrada com sucesso!");
@@ -73,7 +74,7 @@ public class MarcaController {
     //-------------------------------- PUT ----------------------------------------
 
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Marca marca) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody @Validated final Marca marca) {
 
 
         try {

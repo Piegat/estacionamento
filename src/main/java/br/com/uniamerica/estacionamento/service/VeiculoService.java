@@ -44,28 +44,16 @@ public class VeiculoService {
     public Veiculo editar(Long id, Veiculo veiculo){
 
          // Verifica se o veiculo existe
-
         final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
         Assert.notNull(veiculoBanco, "Veiculo não existe!");
 
 
          // Verifica os veiculos coincidem
-
         Assert.isTrue(veiculoBanco.getId().equals(veiculo.getId()), "Veiculo informado não é o mesmo que o veiculo a ser atualizado");
 
-        final List<Veiculo> veiculosByPlaca = this.veiculoRepository.findByPlaca(veiculo.getPlaca());
-        Assert.isTrue(veiculosByPlaca.isEmpty(),  String.format("Veiculo com placa [ %s ] já existe!", veiculo.getPlaca()));
 
-         // Verifica os campos que são notNull
-
-        Assert.notNull(veiculo.getCadastro(), "Data do cadastro não informada!");
-        Assert.notNull(veiculo.getPlaca(), "Placa do veiculo não informada!");
-        Assert.hasText(veiculo.getPlaca(), "Placa do veiculo vazia!");
-        Assert.notNull(veiculo.getCor(), "Cor do veiculo não informada!");
-        Assert.notNull(veiculo.getTipoVeiculos(), "Tipo do veiculo não informado!");
 
 //         * Verifica se modelo existe
-
         Assert.notNull(veiculo.getModelo(), "Modelo não informado!");
         final Modelo modelo = this.modeloRepository.findById(veiculo.getModelo().getId()).orElse(null);
         Assert.notNull(modelo, "Modelo não existe!");
