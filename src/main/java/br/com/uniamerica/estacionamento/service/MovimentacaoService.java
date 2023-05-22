@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class MovimentacaoService {
@@ -62,8 +63,6 @@ public class MovimentacaoService {
 
         movimentacao.setValorHora(configuracao.getValorHora()); //Pega valor hora e coloca na movimentação
         movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(new BigDecimal(60))); //Pega o valor Hora da multa
-
-
 
 
 
@@ -120,42 +119,49 @@ public class MovimentacaoService {
 
         Duration duration = Duration.between(entrada, saida); // Armazena em duration a duração de tempo entre a entrada e da saida
         long duracao;
-        duracao = duration.toSeconds();
+        duracao = duration.toMinutes();
 
 
+        //=============================== Setando o tempo no condutor. ===============================
 
-            movimentacao.setHorastempo((int) (duracao / 3600));
+            condutor.setHoras(condutor.getHoras() + (int) (duracao / 60));
 
-            movimentacao.setMinutostempo((int)(duracao%3600)/60);
+            condutor.setMinutos(condutor.getMinutos() + (int)(duracao%60));
 
-            movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(new BigDecimal(60))); //Pega o valor Hora da multa
+            // ==================================== CALCULANDO MINUTOS E TRANSFORANDO EM HORAS ===========================================
 
-
-            condutor.setHoras((int) (duracao / 3600));
-
-            condutor.setMinutos((int)(duracao/60));
-
-
-        // ==================================== CALCULANDO MINUTOS E TRANSFORANDO EM HORAS ===========================================
         if (condutor.getMinutos() > 60){        //Calcula se os minutos no condutor é maior que 60 e se for divide por 60 e armazena o resto da divisão em minutos e soma as horas
-            final int horasExtra =  condutor.getMinutos() /60;
+        final int horasExtra =  condutor.getMinutos() /60;
 
-            condutor.setMinutos(condutor.getMinutos() %60);
-            condutor.setHoras(((int) (duracao/3600) + condutor.getHoras()) + horasExtra); // Setando no cadastro do condutor as horas que ele passou estacionado
-
+        condutor.setMinutos(condutor.getMinutos() %60);
+        condutor.setHoras(((int) (duracao/60) + condutor.getHoras()) + horasExtra); // Setando no cadastro do condutor as horas que ele passou estacionado
         }
 
-        // =====================================================================================================
+
+
+
+            // ============================================== CALCULANDO VALOR =======================================================
 
             final BigDecimal valorTotal;
 
-            valorTotal = new BigDecimal(((int) duracao/3600));
+            valorTotal = new BigDecimal(((int) duracao/60));
 
-            movimentacao.setValorTotal(new BigDecimal((int) duracao/3600).multiply(configuracao.getValorHora()).add(new BigDecimal(movimentacao.getMinutostempo()/60).multiply(movimentacao.getValorHora())));
+            // Setando na movimentação as Horas, Minutos e valorHoraMinuto
+            movimentacao.setHorastempo((int) (duracao / 60));
+            movimentacao.setMinutostempo((int)duracao%60);
+            movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(new BigDecimal(60))); //Pega o valor Hora da multa
+
+            movimentacao.setHorastempo((int)duracao/60);
+            movimentacao.setMinutostempo((int) duracao%60);
+
+            movimentacao.setValorTotal(
+
+                    new BigDecimal(movimentacao.getHorastempo()).multiply(movimentacao.getValorHora())
+                    .add(new BigDecimal(movimentacao.getMinutostempo()).multiply(movimentacao.getValorHora().divide(new BigDecimal(60))))
+            );
             // Calcula o valor total
 
             calcMulta(movimentacao);
-
 
 
         }
@@ -188,23 +194,26 @@ public class MovimentacaoService {
 
         Duration duration = Duration.between(entrada, saida); // Armazena em duration a duração de tempo entre a entrada e da saida
         long duracao;
-        duracao = duration.toSeconds();
+        duracao = duration.toMinutes();
 
 
 
 //                                                IF PARA ADICIONAR A QUANTIDADE DE HORAS/MINUTOS QUE ELE PASSOU APOS O HORARIO DE EXPEDIENTE SEM CONTABILIZAR OS DIAS
 
         if (LocalTime.from(entrada).isBefore(configuracao.getInicioExpediente()) || LocalTime.from(saida).isAfter(configuracao.getFimExpediente())) {
-            long duracaoEntrada, duracaoSaida;
+            long duracaoEntrada = 0, duracaoSaida = 0;
 
-            if((LocalTime.from(entrada).isBefore(configuracao.getInicioExpediente()))) {
+            if(LocalTime.from(entrada).isBefore(configuracao.getInicioExpediente())) {
 
                 Duration durationEntrada = Duration.between(entrada, saida);
-                Duration durationAntesDoFim = Duration.between(saida, configuracao.getInicioExpediente());// Guarda o tempo permanecido antes de chegar ao fim do expediente.
 
+                duracaoEntrada = durationEntrada.toMinutes();
 
-                duracaoEntrada = durationEntrada.toMinutes() - durationAntesDoFim.toMinutes();
+                if (LocalTime.from(saida).isAfter(configuracao.getInicioExpediente())) {
+                    Duration durationAntesDoFim = Duration.between(LocalTime.from(saida), configuracao.getInicioExpediente());// Guarda o tempo permanecido antes de chegar ao fim do expediente.
 
+                    duracaoEntrada = durationEntrada.toMinutes() - durationAntesDoFim.toMinutes();
+                }
 
                 movimentacao.setMinutosMulta((int)(movimentacao.getMinutosMulta()+(duracaoEntrada %60))); // Calculando e adicionando os minutos divindo o total de segundos 60 para transformar em minutos
                 movimentacao.setHorasMulta((int) (movimentacao.getHorasMulta()+(duracaoEntrada/60))); //  Calculando e adicionando os horas divindo o total de segundos por 3600
@@ -213,16 +222,18 @@ public class MovimentacaoService {
 
 
             }
-            if((LocalTime.from(saida).isAfter(configuracao.getFimExpediente()))) {
+            if(LocalTime.from(saida).isAfter(configuracao.getFimExpediente())) {
 
                 Duration durationSaida = Duration.between(entrada, saida);
+                duracaoSaida = durationSaida.toMinutes();
 
-                Duration durationAntesDoFim = Duration.between(entrada, configuracao.getFimExpediente());// Guarda o tempo permanecido antes de chegar ao fim do expediente.
+                if (LocalTime.from(entrada).isBefore(configuracao.getFimExpediente())) {
 
-                duracaoSaida = durationSaida.toMinutes() - durationAntesDoFim.toMinutes();
+                    Duration durationAntesDoFim = Duration.between(LocalTime.from(entrada), configuracao.getFimExpediente());// Guarda o tempo permanecido antes de chegar ao fim do expediente.
 
-
-                movimentacao.setMinutosMulta((int)(movimentacao.getMinutosMulta()+(duracaoSaida %60))); // Calculando e adicionando os minutos divindo o total de segundos 60 para transformar em minutos
+                    duracaoSaida = durationSaida.toMinutes() - durationAntesDoFim.toMinutes();
+                }
+                movimentacao.setMinutosMulta((int)(movimentacao.getMinutosMulta()+duracaoSaida %60)); // Calculando e adicionando os minutos divindo o total de segundos 60 para transformar em minutos
                 movimentacao.setHorasMulta((int) (movimentacao.getHorasMulta()+(duracaoSaida/60))); //  Calculando e adicionando os horas divindo o total de segundos por 3600
 
             }
@@ -230,15 +241,18 @@ public class MovimentacaoService {
         }
 
 
-        if(duracao > 86400){
+        if(duracao >= 1440){
 
-            duracao = (int) duracao/86400;
+            duracao = (int) duracao/1440;
+
 
 
         }
 
 
     }
+
+
 
 }
 
