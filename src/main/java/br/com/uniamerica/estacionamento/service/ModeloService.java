@@ -56,8 +56,11 @@ public class ModeloService {
 
         // Verifica se o modelo já existe!
         final List<Modelo> modelosByNome = this.modeloRepository.findByNome(modelo.getNome());
-        Assert.isTrue(modelosByNome.isEmpty(), String.format("Modelo %s já existe!", modelo.getNome()));
+        if (!modelosByNome.isEmpty()){
 
+            Assert.isTrue(modelosByNome.get(0).getId().equals(modelo.getId()), "Modelo já existe!");
+
+        }
         // Verifica se a marca já existe
         final Marca marca = this.marcaRepository.findById(modelo.getMarca().getId()).orElse(null);
         Assert.notNull(marca, "Marca inexistente");

@@ -1,6 +1,7 @@
 package br.com.uniamerica.estacionamento.service;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
+import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.repositoriy.CondutorRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,10 @@ public class CondutorService {
 
         //Não ter dois CPFs identicos
         final List<Condutor> condutorByCpf = this.condutorRepository.findByCpf(condutor.getCpf());
-        Assert.isTrue(condutorByCpf.isEmpty(), "Condutor com CPF já existente!");
 
+        if (!condutorByCpf.isEmpty()){
+            Assert.isTrue(condutorByCpf.get(0).getId().equals(condutor.getId()), "Condutor já existe!");
+        }
         return this.condutorRepository.save(condutor);
 
     }

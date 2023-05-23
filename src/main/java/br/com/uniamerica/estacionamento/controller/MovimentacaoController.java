@@ -69,8 +69,7 @@ public class MovimentacaoController {
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         {
             try {
-                final Movimentacao movimentacaoBanco = this.movimentacaoService.editar(id, movimentacao);
-                return ResponseEntity.ok("Movimentação editado com sucesso");
+                return this.movimentacaoService.editar(id, movimentacao);
             } catch (Exception e){
                 return ResponseEntity.badRequest().body(e.getMessage());
             }

@@ -66,7 +66,7 @@ public class MovimentacaoService {
 
 
         movimentacao.setValorHora(configuracao.getValorHora()); //Pega valor hora e coloca na movimentação
-        movimentacao.setValorHoraMulta(configuracao.getValorMulta()); //Pega o valor Hora da multa
+        movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply( new BigDecimal(60))); //Pega o valor Hora da multa
 
 
 
@@ -75,7 +75,7 @@ public class MovimentacaoService {
 
 
     @Transactional
-    public Movimentacao editar(Long id, Movimentacao movimentacao) {
+    public ResponseEntity<String> editar(Long id, Movimentacao movimentacao) {
 
         final Configuracao configuracao = this.configuracaoRepository.findByConfiguracao();
 
@@ -106,9 +106,7 @@ public class MovimentacaoService {
         Assert.notNull(veiculo, "Veiculo não existe!");
 
 
-//        Setando Valor hora
-        movimentacao.setValorHora(configuracao.getValorHora());
-
+        String resposta= "";
 
         if (movimentacao.getSaida() != null){ //Se a saida não for nula
 
@@ -119,8 +117,30 @@ public class MovimentacaoService {
 
         }
 
-        gerarComprovante(movimentacao.getId());
-        return this.movimentacaoRepository.save(movimentacao);
+        if (movimentacao.getSaida() != null) {
+
+            resposta = String.format("\tESTACIONAMENTO DO PEDRO\t\n" +
+                    "\n=======================\n" +
+                    "Condutor: " + movimentacao.getCondutor().getNome() + "\n" +
+                    "Veiculo: " + movimentacao.getVeiculo().getModelo().getNome() + " | " + movimentacao.getVeiculo().getPlaca() + " | " + movimentacao.getVeiculo().getCor() + "\n" +
+                    "Tempo Estacionado: " + movimentacao.getHorastempo() + " Horas e " + movimentacao.getMinutostempo() + " Minutos \n" +
+                    "\n=======================\n" +
+                    "Tempo Multa: " + movimentacao.getHorasMulta() + " Horas e " + movimentacao.getMinutosMulta() + " Minutos \n" +
+                    "Valor Multa: " + movimentacao.getValorMulta() + "\n" +
+                    "\n=======================\n" +
+                    "Tempo Desconto: " + movimentacao.getTempoDesconto() + "\n" +
+                    "Valor Desconto: " + movimentacao.getValorDesconto() + "\n" +
+                    "\n=======================\n" +
+                    "\nValor Total: " + movimentacao.getValorTotal());
+        } else  {
+
+            resposta = String.format("Movimentação editada com sucesso!");
+
+        }
+
+        this.movimentacaoRepository.save(movimentacao);
+
+        return ResponseEntity.ok(resposta);
     }
 
 
@@ -174,6 +194,7 @@ public class MovimentacaoService {
         }
         if (dias > 0){
             int foraExpediente = (int) Duration.between(configuracao.getInicioExpediente(), configuracao.getFimExpediente()).toMinutes();
+            System.out.println(foraExpediente);
             int duracaoTotal = (int) tempoTotal;
 
 
@@ -196,7 +217,7 @@ public class MovimentacaoService {
         movimentacao.setMinutosMulta(TempoTotalMinutos%60);
 
 
-        final BigDecimal valorMulta = new BigDecimal(TempoTotalMinutos/60).multiply(configuracao.getValorMulta());
+        final BigDecimal valorMulta = new BigDecimal(TempoTotalMinutos/60).multiply(movimentacao.getValorHoraMulta());
 
 
         movimentacao.setValorMulta(valorMulta);
@@ -283,24 +304,7 @@ public class MovimentacaoService {
 //    }
 //
 
-    private ResponseEntity<?> gerarComprovante(Long id){
-
-        final Movimentacao movimentacao = this.movimentacaoRepository.findById(id).orElse(null);
-
-
-        return ResponseEntity.ok(String.format("\tESTACIONAMENTO DO PEDRO\t" +
-                "=======================" +
-                "Condutor: " + movimentacao.getCondutor().getNome() +
-                "Veiculo: " + movimentacao.getVeiculo().getModelo() + " | "+ movimentacao.getVeiculo().getPlaca() + " | " + movimentacao.getVeiculo().getCor() + "\n" +
-                "Tempo Estacionado: " + movimentacao.getHorastempo() + ":" + movimentacao.getMinutostempo() + "\n" +
-                "=======================" +
-                "Tempo Multa: " + movimentacao.getHorasMulta() + ":" + movimentacao.getMinutosMulta() + "\n" +
-                "Valor Multa: " + movimentacao.getValorMulta() + "\n" +
-                "=======================" +
-                "Tempo Desconto: " + movimentacao.getTempoDesconto() + "\n" +
-                "Valor Desconto: " + movimentacao.getValorDesconto() +"\n" +
-                "=======================" +
-                "Valor Total: " + movimentacao.getValorTotal() ));
+    private void gerarComprovante(String resposta){
 
 
 

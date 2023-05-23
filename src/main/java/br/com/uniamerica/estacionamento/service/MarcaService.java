@@ -42,7 +42,12 @@ public class MarcaService {
         Assert.hasText(marca.getMarca(), "Marca foi deixada em branco");
         //Verifica se marca ja existe
         final List<Marca> marcasByNome = this.marcaRepository.findByNome(marca.getMarca());
-        Assert.isTrue(marcasByNome.isEmpty(), "Marca já existe!");
+        if (!marcasByNome.isEmpty()){
+
+            Assert.isTrue(marcasByNome.get(0).getId().equals(marca.getId()), "Marca já existe!");
+
+        }
+
 
         Assert.notNull(marca.getMarca(), "Marca não informada");
 
