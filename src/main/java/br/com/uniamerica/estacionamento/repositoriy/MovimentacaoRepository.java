@@ -24,9 +24,7 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
     @Query("from Movimentacao where ativo = true")
     public Movimentacao findByAtivo(@Param("ativo") final boolean ativo);
 
-    @Query("SELECT m FROM Movimentacao m ORDER BY m.id DESC LIMIT 1")
-    public Movimentacao findByMovimentacao();
-
-
+    @Query ("from Movimentacao  where saida = null and veiculo.tipoVeiculos = 'CARRO' ")
+    public List <Movimentacao> findByVeiculoCarro();
 
 }

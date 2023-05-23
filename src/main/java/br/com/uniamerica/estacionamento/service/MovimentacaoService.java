@@ -9,7 +9,6 @@ import br.com.uniamerica.estacionamento.repositoriy.ConfiguracaoRepository;
 import br.com.uniamerica.estacionamento.repositoriy.MovimentacaoRepository;
 import br.com.uniamerica.estacionamento.repositoriy.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +43,9 @@ public class MovimentacaoService {
     public Movimentacao cadastrar(final Movimentacao movimentacao) {
 
         final Configuracao configuracao = this.configuracaoRepository.findByConfiguracao();
+        final List<Movimentacao> listaCarro = this.movimentacaoRepository.findByVeiculoCarro();
+
+
 
         //          Verifica os campos que são notNull
         Assert.notNull(movimentacao.getCondutor(), "Condutor não informado! Informe o ID do condutor!");
@@ -114,10 +116,11 @@ public class MovimentacaoService {
             setCondutor(movimentacao); //Setando dados no cadastro do condutor como Tempo Desconto, horas, minutos, etc...
             calcularTotal(movimentacao); //Calculando valores!
 
+
         }
 
+        gerarComprovante(movimentacao.getId());
         return this.movimentacaoRepository.save(movimentacao);
-
     }
 
 
@@ -279,6 +282,33 @@ public class MovimentacaoService {
 //
 //    }
 //
+
+    private ResponseEntity<?> gerarComprovante(Long id){
+
+        final Movimentacao movimentacao = this.movimentacaoRepository.findById(id).orElse(null);
+
+
+        return ResponseEntity.ok(String.format("\tESTACIONAMENTO DO PEDRO\t" +
+                "=======================" +
+                "Condutor: " + movimentacao.getCondutor().getNome() +
+                "Veiculo: " + movimentacao.getVeiculo().getModelo() + " | "+ movimentacao.getVeiculo().getPlaca() + " | " + movimentacao.getVeiculo().getCor() + "\n" +
+                "Tempo Estacionado: " + movimentacao.getHorastempo() + ":" + movimentacao.getMinutostempo() + "\n" +
+                "=======================" +
+                "Tempo Multa: " + movimentacao.getHorasMulta() + ":" + movimentacao.getMinutosMulta() + "\n" +
+                "Valor Multa: " + movimentacao.getValorMulta() + "\n" +
+                "=======================" +
+                "Tempo Desconto: " + movimentacao.getTempoDesconto() + "\n" +
+                "Valor Desconto: " + movimentacao.getValorDesconto() +"\n" +
+                "=======================" +
+                "Valor Total: " + movimentacao.getValorTotal() ));
+
+
+
+
+    }
+
+
+
 
     }
 
