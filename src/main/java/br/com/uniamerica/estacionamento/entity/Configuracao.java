@@ -24,7 +24,7 @@ public class Configuracao extends AbstractEntity{
     private BigDecimal valorHora;
     @Getter @Setter
     @Column(name = "valor_multa_minuto")
-    private BigDecimal valorMinutoMulta;
+    private BigDecimal valorMulta;
     @Getter @Setter
     @Column(name = "inicio_expediente")
     private LocalTime inicioExpediente;
