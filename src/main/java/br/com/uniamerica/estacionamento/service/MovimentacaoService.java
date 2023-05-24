@@ -62,22 +62,27 @@ public class MovimentacaoService {
         movimentacao.setValorMinutoMulta(configuracao.getValorMinutoMulta()); //Pega o valor Hora da multa
 
 
-// =======================================================================================================================================================
-//        final List<Movimentacao> listaVagasUsadas = this.movimentacaoRepository.findByVeiculoCarro(veiculo.getTipoVeiculos().toString());
-//        System.out.println(veiculo.getTipoVeiculos().toString());
+
+
+ //=======================================================================================================================================================
+//        TipoVeiculos tipoveiculo = this.veiculoRepository.findByTipo(movimentacao.getVeiculo().getTipoVeiculos());
+//
+//        final List<Movimentacao> listaVagasUsadas = this.movimentacaoRepository.findByVeiculoCarro(tipoveiculo);
+//        System.out.println(listaVagasUsadas);
+//
 //
 //        int QtdeVagasUsadas = listaVagasUsadas.size();
 //
-//        String tipoveiculo = veiculo.getTipoVeiculos().toString();
 //
 //
 //        switch (tipoveiculo) {
-//            case "CARRO" ->
-//                    Assert.isTrue(QtdeVagasUsadas != configuracao.getVagasCarro(), "Vagas insuficientes para carro");
-//            case "MOTO" ->
-//                    Assert.isTrue(QtdeVagasUsadas != configuracao.getVagasMoto(), "Vagas insuficientes para moto");
-//            case "VAN" ->
-//                    Assert.isTrue(QtdeVagasUsadas != configuracao.getVagasVan(), "Vagas insuficientes para van");
+//            case CARRO ->
+//                    Assert.isTrue(QtdeVagasUsadas == configuracao.getVagasCarro(), "Vagas insuficientes para carro");
+//            case MOTO ->
+//                    Assert.isTrue(QtdeVagasUsadas == configuracao.getVagasMoto(), "Vagas insuficientes para moto");
+//            case VAN ->
+//                    Assert.isTrue(QtdeVagasUsadas == configuracao.getVagasVan(), "Vagas insuficientes para van");
+//
 //        }
 
         return this.movimentacaoRepository.save(movimentacao);
@@ -116,7 +121,6 @@ public class MovimentacaoService {
         String resposta = "";
 
         if (movimentacao.getSaida() != null) { //Se a saida não for nula
-
 
             setCondutor(movimentacao); //Setando dados no cadastro do condutor como Tempo Desconto, horas, minutos, etc...
             calcMulta(movimentacao);
@@ -340,10 +344,11 @@ public class MovimentacaoService {
 
 
 //          Multiplicador atual guarda os minutos pagos e divide eles pelos minutos necessarios para gerar o desconto
-            int multiplicadorAtual = minutosPagosCondutor / minutosParaDesconto;
+            int multiplicadorAtual = minutosEstacionadas / minutosParaDesconto;
 
 //          Multiplicador proximo guarda os minutos pagos e divide eles pelos minutos necessarios para gerar o desconto
-            int multiplicadorProximo = totalDeMinutos / minutosParaDesconto ;
+            int multiplicadorProximo = minutosPagosCondutor / minutosParaDesconto ;
+
 
             System.out.println(multiplicadorAtual);
 
