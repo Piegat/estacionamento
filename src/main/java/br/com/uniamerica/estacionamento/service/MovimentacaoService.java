@@ -66,8 +66,8 @@ public class MovimentacaoService {
 
 
         movimentacao.setValorHora(configuracao.getValorHora()); //Pega valor hora e coloca na movimentação
-        movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply( new BigDecimal(60))); //Pega o valor Hora da multa
-
+        movimentacao.setValorMinutoMulta(configuracao.getValorMinutoMulta()); //Pega o valor Hora da multa
+        System.out.println(configuracao.getValorMinutoMulta() + "VALOR minuto multa");
 
 
         return this.movimentacaoRepository.save(movimentacao);
@@ -112,6 +112,7 @@ public class MovimentacaoService {
 
 
             setCondutor(movimentacao); //Setando dados no cadastro do condutor como Tempo Desconto, horas, minutos, etc...
+            calcMulta(movimentacao);
             calcularTotal(movimentacao); //Calculando valores!
 
 
@@ -194,7 +195,6 @@ public class MovimentacaoService {
         }
         if (dias > 0){
             int foraExpediente = (int) Duration.between(configuracao.getInicioExpediente(), configuracao.getFimExpediente()).toMinutes();
-            System.out.println(foraExpediente);
             int duracaoTotal = (int) tempoTotal;
 
 
@@ -217,14 +217,23 @@ public class MovimentacaoService {
         movimentacao.setMinutosMulta(TempoTotalMinutos%60);
 
 
-        final BigDecimal valorMulta = new BigDecimal(TempoTotalMinutos/60).multiply(movimentacao.getValorHoraMulta());
+        BigDecimal minutoMulta = configuracao.getValorMinutoMulta();
 
+        final BigDecimal valorMulta = minutoMulta // Calculando o valor total da multa
+                .multiply(new BigDecimal(   TempoTotalMinutos))
+                .setScale(2, RoundingMode.UP);
+
+
+        System.out.println(valorMulta + " VALOR MULTA");
 
         movimentacao.setValorMulta(valorMulta);
+
+
     }
 
     private void calcularTotal(Movimentacao movimentacao){
 
+        final Configuracao configuracao = this.configuracaoRepository.findByConfiguracao();
 
         LocalDateTime entrada = movimentacao.getEntrada();
         LocalDateTime saida = movimentacao.getSaida();
@@ -236,7 +245,6 @@ public class MovimentacaoService {
 
         BigDecimal valorTotal;
 
-        calcMulta(movimentacao);
 
 
         BigDecimal valorMulta = movimentacao.getValorMulta();
@@ -245,13 +253,25 @@ public class MovimentacaoService {
         movimentacao.setMinutostempo((int)duracao%60);
         movimentacao.setHorastempo((int)duracao/60);
 
+        int horasTempo = movimentacao.getHorastempo();
+        int minutosTempo = movimentacao.getMinutostempo();
+        BigDecimal valorHora = configuracao.getValorHora();
+
+
         // Calcula o valor total
 
+        System.out.println(horasTempo + " HORAS TEMPO");
+
+        System.out.println(valorHora + " VALOR HORA");
+
+
+
+
         movimentacao.setValorTotal(                 //Calculando o valor total multiplicando as horas da movimentação com o valor hora e somando os minutos multiplicando pelo valor hora e dividindo por 60
-                new BigDecimal(movimentacao.getHorastempo()).multiply(movimentacao.getValorHora())
-                    .add(new BigDecimal(movimentacao.getMinutostempo()).multiply(movimentacao.getValorHora()
-                            .divide(new BigDecimal(60), RoundingMode.HALF_UP)))
-                                .add(valorMulta));//Somando o valor da multa
+                new BigDecimal(horasTempo).multiply(valorHora)
+                    .add(new BigDecimal(minutosTempo).multiply(valorHora
+                            .divide(new BigDecimal(60), RoundingMode.HALF_UP))
+                                .add(valorMulta)));//Somando o valor da multa
 
 
 
