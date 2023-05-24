@@ -22,8 +22,13 @@ public interface VeiculoRepository extends JpaRepository<Veiculo, Long> {
     @Query("from Veiculo where modelo.id = :id")
     public List<Veiculo> findByModeloId(@Param("id") final Long id);
 
+    @Query("from Veiculo where tipoVeiculos = :tipoVeiculo")
+    public List<Veiculo> findByTipo(@Param("tipoVeiculo")  String tipoVeiculo);
+
+
     @Query("from Veiculo where placa = :placa")
     public List<Veiculo> findByPlaca(@Param("placa") final String placa);
+
 
 
 }

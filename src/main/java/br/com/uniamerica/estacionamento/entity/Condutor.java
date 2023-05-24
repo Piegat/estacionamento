@@ -39,18 +39,24 @@ public class Condutor extends AbstractEntity{
 
     @NotNull(message = "não pode ser nulo")
     @Getter @Setter
+    @Column(name = "horas_desconto", nullable = false)
+    private int horasDesconto;
+
+    @NotNull(message = "não pode ser nulo")
+    @Getter @Setter
     @Column(name = "tempo_desconto", nullable = false)
-    private LocalTime tempoDesconto;
+    private int minutosDesconto;
+
 
     @NotNull(message = "não pode ser nulo")
     @Getter @Setter
     @Column(name = "tempo_horas", nullable = false)
-    private int horas;
+    private int horasPagas;
 
     @NotNull(message = "não pode ser nulo")
     @Getter @Setter
     @Column(name = "tempo_minutos", nullable = false)
-    private int minutos;
+    private int minutosPagos;
 
 }
 

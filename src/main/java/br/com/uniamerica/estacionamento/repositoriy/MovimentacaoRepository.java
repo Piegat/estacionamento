@@ -3,6 +3,7 @@ package br.com.uniamerica.estacionamento.repositoriy;
 import br.com.uniamerica.estacionamento.entity.Configuracao;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
+import br.com.uniamerica.estacionamento.entity.TipoVeiculos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,7 +25,7 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
     @Query("from Movimentacao where ativo = true")
     public Movimentacao findByAtivo(@Param("ativo") final boolean ativo);
 
-    @Query ("from Movimentacao  where saida = null and veiculo.tipoVeiculos = 'CARRO' ")
-    public List <Movimentacao> findByVeiculoCarro();
+    @Query ("from Movimentacao  where saida = null and veiculo.tipoVeiculos = :tipoVeiculo ")
+    public List <Movimentacao> findByVeiculoCarro(@Param("tipoVeiculo") String tipoVeiculo);
 
 }
