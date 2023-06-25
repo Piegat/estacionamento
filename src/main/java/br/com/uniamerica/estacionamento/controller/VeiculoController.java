@@ -64,7 +64,7 @@ public class VeiculoController {
     public ResponseEntity<?> cadastrar(@RequestBody @Validated final Veiculo veiculo){
         try {
             final Veiculo newVeiculo = this.veiculoService.cadastrar(veiculo);
-            return ResponseEntity.ok(String.format("Veiulo placa [ %s ] cadastrado com sucesso!", newVeiculo.getPlaca()));
+            return ResponseEntity.ok(String.format("Veiulo placa com [ %s ] cadastrado com sucesso!", newVeiculo.getPlaca()));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

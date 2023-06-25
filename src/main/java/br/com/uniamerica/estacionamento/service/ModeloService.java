@@ -30,7 +30,7 @@ public class ModeloService {
 
 
         final Marca marca = this.marcaRepository.findById(modelo.getMarca().getId()).orElse(null);
-        Assert.notNull(marca, "Marca inexistente");
+        Assert.notNull(modelo.getMarca().getId(), "Marca inexistente");
 
             return this.modeloRepository.save(modelo);
     }
@@ -49,7 +49,6 @@ public class ModeloService {
         Assert.notNull(modelo.getCadastro(), "Data do cadastro não informada!");
 
         Assert.notNull(modelo.getNome(), "Nome do modelo não informado!");
-
         Assert.hasText(modelo.getNome(), "Nome do modelo não informado!");
 
         Assert.notNull(modelo.getMarca(), "Marca não informada!");
@@ -57,9 +56,7 @@ public class ModeloService {
         // Verifica se o modelo já existe!
         final List<Modelo> modelosByNome = this.modeloRepository.findByNome(modelo.getNome());
         if (!modelosByNome.isEmpty()){
-
             Assert.isTrue(modelosByNome.get(0).getId().equals(modelo.getId()), "Modelo já existe!");
-
         }
         // Verifica se a marca já existe
         final Marca marca = this.marcaRepository.findById(modelo.getMarca().getId()).orElse(null);

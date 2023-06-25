@@ -13,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/movimentacoes")
+@RequestMapping(value = "/api/movimentacao")
 public class MovimentacaoController {
 
 
@@ -51,6 +51,13 @@ public class MovimentacaoController {
 
         return ResponseEntity.ok(this.movimentacaoRepository.findAll());
     }
+
+    @GetMapping("/abertas")
+    public ResponseEntity<?> findByAbertas(){
+
+        return ResponseEntity.ok(this.movimentacaoRepository.findByAbertas());
+    }
+
 
 
     // -------------------------------- POST ----------------------------------------

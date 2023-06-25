@@ -17,7 +17,7 @@ public interface ModeloRepository extends JpaRepository<Modelo, Long> {
     @Query("from Modelo where nome Like :nome")
     public List<Modelo> findByLike(@Param("nome")final String nome);
 
-    @Query(value = "select * from Modelo where ativo = true", nativeQuery = true)
+    @Query("from Modelo where ativo = true")
     public List<Modelo> findByAtivo();
 
     @Query("from Modelo where nome = :nome")
